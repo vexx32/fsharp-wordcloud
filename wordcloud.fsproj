@@ -1,16 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Include="src/Constants.fs" />
+    <Compile Include="src\Extensions.fs" />
+    <Compile Include="src\Constants.fs" />
+    <Compile Include="src\Utils.fs" />
+    <Compile Include="src\Shapes.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
   </ItemGroup>
-
 </Project>
