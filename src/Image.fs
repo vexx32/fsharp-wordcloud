@@ -22,7 +22,7 @@ type Image private (size: SKSizeI, backgroundColor: SKColor, allowOverflow: bool
     let mutable backgroundColor = backgroundColor
 
     do
-        if (allowOverflow) then
+        if allowOverflow then
             let clippingScaleX = viewbox.Width * (bleedAreaScale - 1f)
             let clippingScaleY = viewbox.Height * (bleedAreaScale - 1f)
 

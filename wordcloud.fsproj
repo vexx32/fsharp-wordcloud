@@ -4,9 +4,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\Extensions.fs" />
     <Compile Include="src\Constants.fs" />
     <Compile Include="src\Utils.fs" />
+    <Compile Include="src\Extensions.fs" />
     <Compile Include="src\Image.fs" />
     <Compile Include="src\Shapes.fs" />
   </ItemGroup>

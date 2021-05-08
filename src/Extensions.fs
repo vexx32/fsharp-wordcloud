@@ -1,6 +1,7 @@
 namespace wordcloud
 open System
 open SkiaSharp
+open Utils
 
 module Extensions =
     type Int32 with
@@ -30,3 +31,15 @@ module Extensions =
             pathRegion.SetPath(path, usePathBounds = true)
 
             this.Op(pathRegion, operation) |> ignore
+
+        member this.Contains (point: SKPoint) =
+            let bounds: SKRect = !> this.Bounds
+
+            bounds.Left < point.X && point.X < bounds.Right
+                && bounds.Top < point.Y && point.Y < bounds.Bottom
+
+    type SKPoint with
+        member this.Multiply factor =
+            new SKPoint(this.X * factor, this.Y * factor)
+        member this.IsOutside (region: SKRegion) =
+            not (region.Contains this)
