@@ -155,7 +155,9 @@ module Utils =
         | Some Any -> getRandomFloats 0f 361f
         | None -> [ 0f ]
 
-
+    let isMostlyVertical angle =
+        let remainder = Math.Abs(angle % 180f)
+        135f > remainder && remainder > 45f
 
     let fallsOutside (rectangle: SKRect) (region: SKRegion) =
         let bounds: SKRect = !> region.Bounds

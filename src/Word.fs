@@ -3,6 +3,7 @@ namespace wordcloud
 open System
 open SkiaSharp
 open Utils
+open Extensions
 
 module Words =
     type Word =
@@ -65,8 +66,49 @@ module Words =
             | Some bubble -> bubble |> centrePathOnPoint <| point
             | None -> ()
         | None -> ()
-        
 
+    let private getRectanglePath (rectangle: SKRect) =
+        let path = new SKPath()
+        let radius = rectangle.Height / 16f
+        use bubble = new SKRoundRect(rectangle, radius)
+        path.AddRoundRect bubble
+
+        path
+
+    let private getSquarePath (rectangle: SKRect) =
+        let path = new SKPath()
+        let radius = Math.Max(rectangle.Width, rectangle.Height) / 16f
+        use bubble = new SKRoundRect(rectangle |> getEnclosingSquare, radius)
+        path.AddRoundRect bubble
+
+        path
+
+    let private getCirclePath (rectangle: SKRect) =
+        let path = new SKPath()
+        let radius = Math.Max(rectangle.Width, rectangle.Height) / 2f
+        path.AddCircle(x = rectangle.MidX, y = rectangle.MidY, radius = radius)
+
+        path
+
+    let private getOvalPath (rectangle: SKRect) =
+        let padding = float32 (Math.Sqrt <| float (rectangle.Width * rectangle.Height)) / 10f
+        let path = new SKPath()
+        SKRect.Inflate(rectangle, x = padding, y = padding)
+        |> path.AddOval
+
+        path
+        
+    let getWordBubble shape (word: Word) =
+        match word.Path with
+        | Some path -> 
+            let bounds = SKRect.Inflate(word.Bounds, word.Padding, word.Padding)
+            match shape with
+            | Some Rectangle -> getRectanglePath bounds |> Some
+            | Some Square -> getSquarePath bounds |> Some
+            | Some Circle -> getCirclePath bounds |> Some
+            | Some Oval -> getOvalPath bounds |> Some
+            | None -> None
+        | None -> None
 
         
 
