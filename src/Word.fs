@@ -110,6 +110,29 @@ module Words =
             | None -> None
         | None -> None
 
+    let private wordRectFits rectangle padding (image: Image) =
+        let paddedRect = SKRect.Inflate(rectangle, x = padding, y = padding)
+        not (intersectsRectangle image.OccupiedSpace rectangle)
+
+    let private getPaddedPath padding (path: SKPath)  =
+        let scale = SKMatrix.CreateScale(x = 1f + padding / path.TightBounds.Width, y = 1f + padding / path.TightBounds.Height, pivotX = path.TightBounds.MidX, pivotY = path.TightBounds.MidY)
+        let resultPath = new SKPath()
+        path.Transform(scale, resultPath)
+        
+        resultPath
+
+    let private wordPathFits (path: SKPath) padding (image: Image) =
+        use paddedPath = path |> getPaddedPath padding
+        not (intersectsPath image.OccupiedSpace paddedPath)
+
+    let wordWillFit (word: Word) (image: Image) =
+        if fallsOutside word.Bounds image.ClippingRegion then
+            false
+        else
+            match word.Bubble with
+            | Some bubble -> wordPathFits bubble word.Padding image
+            | None -> wordRectFits word.Bounds word.Padding image
+
         
 
     

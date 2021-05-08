@@ -210,3 +210,12 @@ module Utils =
         document.Save writer
 
         stringBuilder.ToString()
+
+    let rec disposeAll (list: IDisposable list) =
+        match list with
+        | head :: tail -> 
+            head.Dispose()
+            disposeAll tail
+        | [] -> ()
+
+    
