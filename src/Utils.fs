@@ -8,7 +8,6 @@ open Constants
 
 module Utils =
 
-    [<Struct>]
     type WordOrientations = 
     | Vertical
     | FlippedVertical
@@ -20,7 +19,6 @@ module Utils =
     | AnyInverted
     | Any
 
-    [<Struct>]
     type BubbleShape =
     | Rectangle
     | Square
@@ -70,7 +68,8 @@ module Utils =
         let mutable totalBlue = 0
         let mutable totalAlpha = 0
 
-        colorList |> List.iter (fun (color: SKColor) -> 
+        colorList
+        |> List.iter (fun (color: SKColor) -> 
             totalRed <- totalRed + int color.Red
             totalGreen <- totalGreen + int color.Green
             totalBlue <- totalBlue + int color.Blue

@@ -8,7 +8,7 @@
     <Compile Include="src\Utils.fs" />
     <Compile Include="src\Extensions.fs" />
     <Compile Include="src\Image.fs" />
-    <Compile Include="src\Word.fs" />
+    <Compile Include="src\Words.fs" />
     <Compile Include="src\Shapes.fs" />
   </ItemGroup>
   <ItemGroup>

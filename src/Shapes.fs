@@ -44,5 +44,3 @@ module Shapes =
                     startingAngle - 360
             
             [ for angle in startingAngle .. increment .. maxAngle -> getPointOnEllipse ellipse angle ]
-
-    
