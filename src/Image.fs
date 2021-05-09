@@ -23,8 +23,8 @@ type Image private (size: SKSizeI, backgroundColor: SKColor, allowOverflow: bool
 
     do
         if allowOverflow then
-            let clippingScaleX = viewbox.Width * (bleedAreaScale - 1f)
-            let clippingScaleY = viewbox.Height * (bleedAreaScale - 1f)
+            let clippingScaleX = viewbox.Width * (BleedAreaScale - 1f)
+            let clippingScaleY = viewbox.Height * (BleedAreaScale - 1f)
 
             SKRect.Inflate(viewbox, clippingScaleX, clippingScaleY)
             |> SKRectI.Round
@@ -53,7 +53,7 @@ type Image private (size: SKSizeI, backgroundColor: SKColor, allowOverflow: bool
     member val MaxDrawRadius = 
         let radius = SKPoint.Distance(this.Origin, this.Centre)
         if allowOverflow then
-            radius * bleedAreaScale
+            radius * BleedAreaScale
         else
             radius
 
@@ -97,7 +97,7 @@ type Image private (size: SKSizeI, backgroundColor: SKColor, allowOverflow: bool
         then
             try
                 this.Canvas.DrawBitmap(background, x = 0f, y = 0f)
-                this.backgroundColor <- List.ofArray background.Pixels |> getAverageColor
+                this.backgroundColor <- List.ofArray background.Pixels |> GetAverageColor
             finally
                 background.Dispose()
 

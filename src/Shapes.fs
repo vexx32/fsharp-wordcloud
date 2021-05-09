@@ -24,25 +24,25 @@ module Shapes =
     /// <param name="ellipse">The ellipse for which to get perimeter points.</param>
     /// <param name="radialStep">The step radial distance between each point.</param>
     /// <returns>A list of points that comprise the ellipse. If the primary axis of the ellipse is <c>0</c> then the only point in the list will be its centre.</returns>
-    let getEllipsePoints ellipse radialStep =
-            if (ellipse.SemiMinorAxis = 0f) then
-                [ ellipse.Centre ]
-            else 
-                let startingAngle = random.Next(0, 5) * 90
-                let clockwise = random.NextDouble() > 0.5
-                
-                let increment = 
-                    if clockwise then
-                        getAngleIncrement ellipse.SemiMinorAxis radialStep
-                    else
-                        - (getAngleIncrement ellipse.SemiMinorAxis radialStep)
+    let GetEllipsePoints radialStep ellipse =
+        if (ellipse.SemiMinorAxis = 0f) then
+            [ ellipse.Centre ]
+        else 
+            let startingAngle = random.Next(0, 5) * 90
+            let clockwise = random.NextDouble() > 0.5
+            
+            let increment = 
+                if clockwise then
+                    GetAngleIncrement ellipse.SemiMinorAxis radialStep
+                else
+                    - (GetAngleIncrement ellipse.SemiMinorAxis radialStep)
 
-                let maxAngle = 
-                    if clockwise then
-                        startingAngle + 360
-                    else 
-                        startingAngle - 360
-                
-                [ for angle in startingAngle .. increment .. maxAngle -> getPointOnEllipse ellipse angle ]
+            let maxAngle = 
+                if clockwise then
+                    startingAngle + 360
+                else 
+                    startingAngle - 360
+            
+            [ for angle in startingAngle .. increment .. maxAngle -> getPointOnEllipse ellipse angle ]
 
     

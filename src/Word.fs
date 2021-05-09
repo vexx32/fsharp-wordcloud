@@ -44,26 +44,26 @@ module Words =
                 | Some b -> b.Dispose()
                 | None -> ()
 
-    let getScaledSize (word: Word) scale = word.Size * scale
+    let GetScaledSize (word: Word) scale = word.Size * scale
 
-    let rotateWord (word: Word) degrees =
+    let RotateWord degrees (word: Word) =
         match word.Path with
         | Some path -> 
             word.Angle <- word.Angle + degrees
-            path |> rotatePath <| degrees
+            path |> Rotate <| degrees
             
             match word.Bubble with
-            | Some path -> path |> rotatePath <| degrees
+            | Some path -> path |> Rotate <| degrees
             | None -> ()
         | None -> ()
 
-    let moveWord (word: Word) point =
+    let MoveWordTo point (word: Word) =
         match word.Path with
         | Some path ->
-            path |> centrePathOnPoint <| point
+            path |> MoveTo point
 
             match word.Bubble with
-            | Some bubble -> bubble |> centrePathOnPoint <| point
+            | Some bubble -> bubble |> MoveTo point
             | None -> ()
         | None -> ()
 
@@ -78,7 +78,7 @@ module Words =
     let private getSquarePath (rectangle: SKRect) =
         let path = new SKPath()
         let radius = Math.Max(rectangle.Width, rectangle.Height) / 16f
-        use bubble = new SKRoundRect(rectangle |> getEnclosingSquare, radius)
+        use bubble = new SKRoundRect(rectangle |> GetEnclosingSquare, radius)
         path.AddRoundRect bubble
 
         path
@@ -98,7 +98,7 @@ module Words =
 
         path
         
-    let getWordBubble shape (word: Word) =
+    let GetWordBubble shape (word: Word) =
         match word.Path with
         | Some path -> 
             let bounds = SKRect.Inflate(word.Bounds, word.Padding, word.Padding)
@@ -110,9 +110,9 @@ module Words =
             | None -> None
         | None -> None
 
-    let private wordRectFits rectangle padding (image: Image) =
+    let private rectFitsIn (image: Image) padding rectangle =
         let paddedRect = SKRect.Inflate(rectangle, x = padding, y = padding)
-        not (intersectsRectangle image.OccupiedSpace rectangle)
+        not (IntersectsRectangle image.OccupiedSpace rectangle)
 
     let private getPaddedPath padding (path: SKPath)  =
         let scale = SKMatrix.CreateScale(x = 1f + padding / path.TightBounds.Width, y = 1f + padding / path.TightBounds.Height, pivotX = path.TightBounds.MidX, pivotY = path.TightBounds.MidY)
@@ -121,17 +121,17 @@ module Words =
         
         resultPath
 
-    let private wordPathFits (path: SKPath) padding (image: Image) =
+    let private pathFitsIn (image: Image) padding (path: SKPath)=
         use paddedPath = path |> getPaddedPath padding
-        not (intersectsPath image.OccupiedSpace paddedPath)
+        not (IntersectsPath image.OccupiedSpace paddedPath)
 
-    let wordWillFit (word: Word) (image: Image) =
-        if fallsOutside word.Bounds image.ClippingRegion then
+    let WordFitsIn (image: Image) (word: Word) =
+        if word.Bounds |> FallsOutside image.ClippingRegion then
             false
         else
             match word.Bubble with
-            | Some bubble -> wordPathFits bubble word.Padding image
-            | None -> wordRectFits word.Bounds word.Padding image
+            | Some bubble -> bubble |> pathFitsIn image word.Padding
+            | None -> word.Bounds |> rectFitsIn image word.Padding 
 
         
 

@@ -33,22 +33,22 @@ module Utils =
 
     let private random = Random()
 
-    let getBrush color wordSize strokeWidth typeface =
+    let GetBrush color wordSize strokeWidth typeface =
         new SKPaint(
             Typeface = typeface,
             TextSize = wordSize,
             Style = SKPaintStyle.StrokeAndFill,
             Color = color,
-            StrokeWidth = wordSize * strokeWidth * strokeBaseScale,
+            StrokeWidth = wordSize * strokeWidth * StrokeBaseScale,
             IsStroke = false,
             IsAutohinted = true,
             IsAntialias = true)
 
-    let getPlainBrush = getBrush SKColors.Black
+    let GetPlainBrush = GetBrush SKColors.Black
 
-    let averageCharArea (typeface: SKTypeface) =
+    let AverageCharArea (typeface: SKTypeface) =
         let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-        use brush = getPlainBrush 1f 0f typeface
+        use brush = GetPlainBrush 1f 0f typeface
         use path = brush.GetTextPath(alphabet, x = 0f, y = 0f)
 
         let bounds = path.TightBounds
@@ -60,11 +60,11 @@ module Utils =
     /// <param name="radius">The distance from the centre point.</param>
     /// <param name="step">The radial step increment value.</param>
     /// <returns></returns>
-    let getAngleIncrement (radius: float32) step =
-        step * baseAngularIncrement
+    let GetAngleIncrement (radius: float32) step =
+        step * BaseAngularIncrement
         / (15 * int (Math.Sqrt(float radius)))
 
-    let getAverageColor (colorList: list<SKColor>) =
+    let GetAverageColor (colorList: list<SKColor>) =
         let mutable totalRed = 0
         let mutable totalGreen = 0
         let mutable totalBlue = 0
@@ -83,18 +83,20 @@ module Utils =
 
         SKColor(red, green, blue, alpha)
         
-    let monochrome (color: SKColor) =
+    let ToGreyscale (color: SKColor) =
         match color.ToHsv() with
         | _, _, brightness -> 
             let level = byte (Math.Floor(255.0 * float brightness / 100.0))
             SKColor(level, level, level)
 
-    let isTransparent (color: SKColor) =
+    let IsTransparent (color: SKColor) =
         color.Alpha = 0uy
 
-    let distinctFrom (target: SKColor) (reference: SKColor) =
-        if isTransparent target then
+    let IsDistinctFrom (reference: SKColor) (target: SKColor)  =
+        if IsTransparent target then
             false
+        elif IsTransparent reference then
+            true
         else
             let (refHue, refSaturation, refBrightness) = reference.ToHsv()
             let (hue, saturation, brightness) = target.ToHsv()
@@ -109,13 +111,13 @@ module Utils =
                 || (b > 18f && s > 24f) -> true
             | _ -> false
 
-    let getEnclosingSquare (rectangle: SKRect) =
+    let GetEnclosingSquare (rectangle: SKRect) =
         match rectangle with
         | wide when wide.Width > wide.Height -> SKRect.Inflate(wide, x = 0f, y = (wide.Width - wide.Height) / 2f)
         | tall when tall.Height > tall.Width -> SKRect.Inflate(tall, x = (tall.Height - tall.Width) / 2f, y = 0f)
         | square -> square
 
-    let shuffle (list: list<'a>) =
+    let Shuffle (list: 'a list) =
         let mutable index = list.Length
         let array = List.toArray list
 
@@ -129,80 +131,80 @@ module Utils =
 
         List.ofArray array
 
-    let randomFloat min max =
+    let RandomFloat min max =
         if min >= max then
             max
         else
             let range = max - min
             float32 (random.NextDouble()) * range + min
        
-    let getRandomFloats min max =
+    let GetRandomFloats min max =
         let minCount = 3
         let maxCount = 17
 
-        [ for _ in minCount .. maxCount -> randomFloat min max ]
+        [ for _ in minCount .. maxCount -> RandomFloat min max ]
 
-    let getRotationAngles orientations =
+    let GetRotationAngles orientations =
         match orientations with
-        | Some Vertical -> shuffle [0f; 90f]
-        | Some FlippedVertical -> shuffle [0f; -90f]
-        | Some EitherVertical -> shuffle [0f; 90f; -90f]
-        | Some UprightDiagonal -> shuffle [-90f .. 45f .. 90f]
-        | Some InvertedDiagonal -> shuffle [90f; 135f; -135f; -90f; 180f]
-        | Some AnyDiagonal -> shuffle [45f; 90f; 135f; 180f; -135f; -90f; -45f; 0f]
-        | Some AnyUpright -> getRandomFloats -90f 91f
-        | Some AnyInverted -> getRandomFloats 90f 271f
-        | Some Any -> getRandomFloats 0f 361f
+        | Some Vertical -> Shuffle [0f; 90f]
+        | Some FlippedVertical -> Shuffle [0f; -90f]
+        | Some EitherVertical -> Shuffle [0f; 90f; -90f]
+        | Some UprightDiagonal -> Shuffle [-90f .. 45f .. 90f]
+        | Some InvertedDiagonal -> Shuffle [90f; 135f; -135f; -90f; 180f]
+        | Some AnyDiagonal -> Shuffle [45f; 90f; 135f; 180f; -135f; -90f; -45f; 0f]
+        | Some AnyUpright -> GetRandomFloats -90f 91f
+        | Some AnyInverted -> GetRandomFloats 90f 271f
+        | Some Any -> GetRandomFloats 0f 361f
         | None -> [ 0f ]
 
-    let isMostlyVertical angle =
+    let IsMostlyVertical angle =
         let remainder = Math.Abs(angle % 180f)
         135f > remainder && remainder > 45f
 
-    let fallsOutside (rectangle: SKRect) (region: SKRegion) =
+    let FallsOutside (region: SKRegion) (rectangle: SKRect) =
         let bounds: SKRect = !> region.Bounds
         rectangle.Top < bounds.Top
         || rectangle.Bottom > bounds.Bottom
         || rectangle.Left < bounds.Left
         || rectangle.Right > bounds.Right
     
-    let isEmpty (region: SKRegion) = region.Bounds.IsEmpty
+    let IsEmpty (region: SKRegion) = region.Bounds.IsEmpty
 
-    let intersectsRectangle (region: SKRegion) rectangle =
-        if isEmpty region then
+    let IntersectsRectangle (region: SKRegion) rectangle =
+        if IsEmpty region then
             false
         else
             rectangle 
             |> SKRectI.Round 
             |> region.Intersects
 
-    let intersectsPath (region: SKRegion) (path: SKPath) =
-        if isEmpty region then
+    let IntersectsPath (region: SKRegion) (path: SKPath) =
+        if IsEmpty region then
             false
         else
             region.Intersects(path)
 
-    let centrePathOnPoint (path: SKPath) (point: SKPoint) =
+    let MoveTo (point: SKPoint) (path: SKPath) =
         let midpoint = new SKPoint(path.TightBounds.MidX, path.TightBounds.MidY)
         path.Offset(point - midpoint)
 
-    let rotatePath (path: SKPath) degrees =
+    let Rotate (path: SKPath) degrees =
         let bounds = path.TightBounds
         let matrix = SKMatrix.CreateRotationDegrees(degrees, bounds.MidX, bounds.MidY)
         path.Transform matrix
 
-    let setBrushFill (brush: SKPaint) color =
+    let SetFill color (brush: SKPaint) =
         brush.IsStroke <- false
         brush.Style <- SKPaintStyle.Fill
         brush.Color <- color
 
-    let setBrushStroke (brush: SKPaint) color width =
+    let SetBrushStroke color width (brush: SKPaint) =
         brush.IsStroke <- true
         brush.StrokeWidth <- width
         brush.Style <- SKPaintStyle.Stroke
         brush.Color <- color
 
-    let getPrettyXml (document: XmlDocument) =
+    let GetPrettyXml (document: XmlDocument) =
         let stringBuilder = new StringBuilder()
         let settings = XmlWriterSettings(Indent = true)
 
@@ -211,11 +213,11 @@ module Utils =
 
         stringBuilder.ToString()
 
-    let rec disposeAll (list: IDisposable list) =
+    let rec DisposeAll (list: IDisposable list) =
         match list with
         | head :: tail -> 
             head.Dispose()
-            disposeAll tail
+            DisposeAll tail
         | [] -> ()
 
     
