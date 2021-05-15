@@ -1,5 +1,6 @@
 namespace wordcloud
 
+open System
 open System.Reflection
 open SkiaSharp
 
@@ -538,3 +539,52 @@ module Colors =
         let mutable colorList = []
         Map.iter (fun _ value -> colorList <- value :: colorList ) StandardColors
         colorList
+
+    
+    let GetAverageColor (colorList: list<SKColor>) =
+        let mutable totalRed = 0
+        let mutable totalGreen = 0
+        let mutable totalBlue = 0
+        let mutable totalAlpha = 0
+
+        colorList
+        |> List.iter (fun (color: SKColor) -> 
+            totalRed <- totalRed + int color.Red
+            totalGreen <- totalGreen + int color.Green
+            totalBlue <- totalBlue + int color.Blue
+            totalAlpha <- totalAlpha + int color.Alpha)
+
+        let red = byte (totalRed / colorList.Length)
+        let green = byte (totalRed / colorList.Length)
+        let blue = byte (totalBlue / colorList.Length)
+        let alpha = byte (totalBlue / colorList.Length)
+
+        SKColor(red, green, blue, alpha)
+        
+    let ToGreyscale (color: SKColor) =
+        match color.ToHsv() with
+        | _, _, brightness -> 
+            let level = byte (Math.Floor(255.0 * float brightness / 100.0))
+            SKColor(level, level, level)
+
+    let IsTransparent (color: SKColor) =
+        color.Alpha = 0uy
+
+    let IsDistinctFrom (reference: SKColor) (target: SKColor)  =
+        if IsTransparent target then
+            false
+        elif IsTransparent reference then
+            true
+        else
+            let (refHue, refSaturation, refBrightness) = reference.ToHsv()
+            let (hue, saturation, brightness) = target.ToHsv()
+
+            let brightnessDistance = Math.Abs(refBrightness - brightness)
+            let hueDistance = Math.Abs(refHue - hue)
+            let saturationDistance = Math.Abs(refSaturation - saturation)
+
+            match brightnessDistance, hueDistance, saturationDistance with
+            | b, h, s when b > 30f 
+                || (b > 20f && h > 24f)
+                || (b > 18f && s > 24f) -> true
+            | _ -> false
