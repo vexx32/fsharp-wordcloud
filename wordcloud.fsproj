@@ -11,6 +11,7 @@
     <Compile Include="src\Image.fs" />
     <Compile Include="src\Words.fs" />
     <Compile Include="src\Shapes.fs" />
+    <Compile Include="src\WordCloud.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
