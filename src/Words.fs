@@ -187,7 +187,8 @@ module Words =
             | None -> word.Bounds |> rectFitsIn image word.Padding
 
     let SplitChars =
-        [ ' '
+        [|
+          ' '
           '\n'
           '\t'
           '\r'
@@ -217,7 +218,7 @@ module Words =
           '^'
           '&'
           '+'
-          '=' ]
+          '=' |]
 
     let private stopWords =
         [ "a"
