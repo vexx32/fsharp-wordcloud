@@ -1,6 +1,7 @@
 namespace wordcloud
 
 open System
+open System.Text.RegularExpressions
 open SkiaSharp
 open Utils
 open Extensions
@@ -185,6 +186,13 @@ module Words =
             match word.Bubble with
             | Some bubble -> bubble |> pathFitsIn image word.Padding
             | None -> word.Bounds |> rectFitsIn image word.Padding
+
+    let InvalidWordChars = Regex(@"^[^a-zA-Z0-9]+|[^a-zA-Z0-9]+$")
+
+    let internal nonAlphaChars = Regex("[^a-zA-Z-]")
+
+    let CountLetters word =
+        nonAlphaChars.Replace(word, "").Length
 
     let SplitChars =
         [|
